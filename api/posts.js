@@ -80,16 +80,34 @@ router.delete('/:id', async (req, res) => {
     if (count > 0) {
       res.json({ message: `The post with the specified id (${req.params.id}) has been removed.`});
     } else {
-      res.status(404).json({ error: `The post could not be removed` });
+      res.status(404).json({ error: `The post with the specified ID (${req.params.id}) does not exist.` });
     }
   } catch (error) {
     console.log(error);
+    res.status(500).json({ error: 'The post could not be removed.' });
   }
 });
 
 // PUT /api/posts/:id
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
+  const { title, contents } = req.body;
+  if (!title || !contents) res.status(400).json({ error: 'Please provide title and contents for the post' });
 
+  try {
+    const post = await db.update(req.params.id, req.body);
+
+    if (post) {
+      res.json({
+        ...post,
+        ...req.body,
+      });
+    } else {
+      res.status(404).json({ error: `The post with the specified ID (${req.params.id}) does not exist.` });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'The post information could not be modified.' });
+  }
 });
 
 module.exports = router;
