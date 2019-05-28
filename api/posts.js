@@ -73,8 +73,18 @@ router.get('/:id/comments', async (req, res) => {
 });
 
 // DELETE /api/posts/:id
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
+  try {
+    const count = await db.remove(req.params.id);
 
+    if (count > 0) {
+      res.json({ message: `The post with the specified id (${req.params.id}) has been removed.`});
+    } else {
+      res.status(404).json({ error: `The post could not be removed` });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // PUT /api/posts/:id
