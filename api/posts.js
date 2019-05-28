@@ -31,7 +31,14 @@ router.post('/:id/comments', (req, res) => {
 
 // GET /api/posts
 router.get('/', async (req, res) => {
-  
+  try {
+    const posts = await db.find();
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({
+      error: 'The posts information could not be retrieved.',
+    });
+  }
 });
 
 // GET /api/posts/:id
