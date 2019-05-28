@@ -8,6 +8,6 @@ server.get('/', (req, res) => {
   res.send('hello world');
 })
 
-server.use('/users', posts);
+server.use('/api/posts', posts);
 
 module.exports = server;
