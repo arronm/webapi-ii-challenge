@@ -15,8 +15,8 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const posts = await db.insert(req.body);
-    res.status(201).json(posts);
+    const post = await db.insert(req.body);
+    res.status(201).json(post);
   } catch (error) {
     res.status(500).json({
       error: 'There was an error while saving the post to the database.',
@@ -36,7 +36,11 @@ router.post('/:id/comments', async (req, res) => {
     });
 
     if (comment) {
-      res.status(201).json(comment);
+      res.status(201).json({
+        ...comment,
+        ...req.body,
+        post_id: req.params.id,
+      });
     } else {
       res.status(404).json({ error: `The post with the specified ID (${req.params.id}) does not exist.` });
     }
@@ -92,10 +96,11 @@ router.get('/:id/comments', async (req, res) => {
 // DELETE /api/posts/:id
 router.delete('/:id', async (req, res) => {
   try {
+    const post = await db.findById(req.params.id);
     const count = await db.remove(req.params.id);
 
     if (count > 0) {
-      res.json({ message: `The post with the specified id (${req.params.id}) has been removed.`});
+      res.json(post);
     } else {
       res.status(404).json({ error: `The post with the specified ID (${req.params.id}) does not exist.` });
     }
