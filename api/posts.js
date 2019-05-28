@@ -43,21 +43,33 @@ router.get('/', async (req, res) => {
 
 // GET /api/posts/:id
 router.get('/:id', async (req, res) => {
-  const posts = await db.findById(req.params.id);
-    try {
-      if (posts) {
-        res.json(posts);
-      } else {
-        res.status(404).json({ error: `The post with the specified ID (${req.params.id}) does not exist.` });
-      }
-    } catch (error) {
+  try {
+    console.log(req.params.id);
+    const posts = await db.findById(req.params.id);
+    if (posts.length > 0) {
+      res.json(posts);
+    } else {
+      res.status(404).json({ error: `The post with the specified ID (${req.params.id}) does not exist.` });
+    }
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'The post information could not be retrieved.' });
   }
 });
 
 // GET /api/posts/:id/comments
-router.get('/:id/comments', (req, res) => {
-
+router.get('/:id/comments', async (req, res) => {
+  try {
+    const comments = await db.findPostComments(req.params.id);
+    if (comments.length > 0) {
+      res.json(comments);
+    } else {
+      res.status(404).json({ error: `The post with the specified ID (${req.params.id}) does not exist.` });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'The comments information could not be retrieved.' });
+  }
 });
 
 // DELETE /api/posts/:id
