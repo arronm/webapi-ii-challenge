@@ -6,8 +6,22 @@ const db = require('../data/db.js');
 // });
 
 // POST /api/posts
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
+  const { title, contents } = req.body;
+  if (!title || !contents) {
+    res.status(400).json({
+      error: 'Please provide title and contents for the post.',
+    });
+  }
 
+  try {
+    const posts = await db.insert(req.body);
+    res.status(201).json(posts);
+  } catch (error) {
+    res.status(500).json({
+      error: 'There was an error while saving the post to the database.',
+    });
+  }
 });
 
 // POST /api/posts/:id/comments
@@ -16,8 +30,8 @@ router.post('/:id/comments', (req, res) => {
 });
 
 // GET /api/posts
-router.get('/', (req, res) => {
-
+router.get('/', async (req, res) => {
+  
 });
 
 // GET /api/posts/:id
