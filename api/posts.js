@@ -25,8 +25,25 @@ router.post('/', async (req, res) => {
 });
 
 // POST /api/posts/:id/comments
-router.post('/:id/comments', (req, res) => {
+router.post('/:id/comments', async (req, res) => {
+  const { text } = req.body;
+  if (!text) res.status(400).json({ error: 'Please provide text for the comment.' });
 
+  try {
+    const comment = await db.insertComment({
+      ...req.body,
+      post_id: req.params.id,
+    });
+
+    if (comment) {
+      res.status(201).json(comment);
+    } else {
+      res.status(404).json({ error: `The post with the specified ID (${req.params.id}) does not exist.` });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'There was an error while saving the comment to the database.' });
+  }
 });
 
 // GET /api/posts
